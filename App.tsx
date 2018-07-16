@@ -4,10 +4,15 @@ import { Provider, connect } from "react-redux";
 
 import store from "./src/store";
 import Router from "./src/router";
+import Loading from "./src/components/Loading";
 
 class AppComponent extends Component {
 	render() {
-		return <Router />;
+		return (
+			<Loading>
+				<Router />
+			</Loading>
+		);
 	}
 }
 

@@ -39,7 +39,7 @@ const SettingsInput = ({ dispatch, username }: Props) => {
 				</View>
 				<View style={style.buttonsRow}>
 					<Button text={"Create game"} linkTo={"/createGame"} />
-					<Button text={"Join game"} linkTo={"/joinGame"} />
+					<Button text={"Join game"} linkTo={"/gamesScreen"} />
 				</View>
 			</View>
 		</KeyboardDismiss>

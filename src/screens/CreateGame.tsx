@@ -1,99 +1,152 @@
-import React from "react";
+import React, { Component } from "react";
 import {
 	TextInput,
 	View,
 	NativeSyntheticEvent,
 	TextInputChangeEventData,
 	StyleSheet,
-	Switch,
 	Text,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
-	Keyboard
+	Slider,
+	TouchableOpacity
 } from "react-native";
+
 import { AppState } from "../store";
 import { Color } from "../gameReducer";
 import { connect } from "react-redux";
-import { changeGameName, changeColorSwitch } from "../gameReducer/actions";
+import {
+	changeGameName,
+	changeColorSwitch,
+	changeMoveTime
+} from "../gameReducer/actions";
 import Header from "../components/Header";
 import { scale } from "../styles/scale";
 import { globalColors } from "../styles/colors";
 import KeyboardDismiss from "../components/KeyboardDismiss";
+import ButtonWFunc from "../components/ButtonWFunc";
+import service from "../../service";
 
 interface Props {
 	gameName: string;
 	switchColor: Color;
 	dispatch: any;
+	moveTime: number;
 }
 
-const CreateGame = ({ gameName, switchColor, dispatch }: Props) => {
-	const onTextChange = (
-		e: NativeSyntheticEvent<TextInputChangeEventData>
-	) => {
-		dispatch(changeGameName(e.nativeEvent.text));
-	};
+class CreateGame extends Component<Props> {
+	public dispatch: any;
+	constructor(props: Props) {
+		super(props);
+		this.onTextChange = this.onTextChange.bind(this);
+		this.whitePress = this.whitePress.bind(this);
+		this.blackPress = this.blackPress.bind(this);
+		this.handleSliderChange = this.handleSliderChange.bind(this);
+		this.handleCreatePress = this.handleCreatePress.bind(this);
+		this.dispatch = this.props.dispatch;
+	}
 
-	const whitePress = () => {
-		dispatch(changeColorSwitch(Color.white));
-	};
+	onTextChange(e: NativeSyntheticEvent<TextInputChangeEventData>) {
+		this.dispatch(changeGameName(e.nativeEvent.text));
+	}
 
-	const blackPress = () => {
-		dispatch(changeColorSwitch(Color.black));
-	};
+	whitePress() {
+		this.dispatch(changeColorSwitch(Color.white));
+	}
 
-	const blackTextColor =
-		switchColor === Color.black
-			? { color: globalColors.white }
-			: { color: globalColors.black };
-	const whiteTextColor =
-		switchColor === Color.white
-			? { color: globalColors.white }
-			: { color: globalColors.black };
+	blackPress() {
+		this.dispatch(changeColorSwitch(Color.black));
+	}
 
-	const blackBackgroundColor =
-		switchColor === Color.black
-			? { backgroundColor: globalColors.black }
-			: { backgroundColor: globalColors.grey };
+	handleSliderChange(e: any) {
+		this.dispatch(changeMoveTime(e));
+	}
 
-	const whiteBackgroundColor =
-		switchColor === Color.white
-			? { backgroundColor: globalColors.black }
-			: { backgroundColor: globalColors.grey };
+	handleCreatePress() {
+		service
+			.createGame(this.props.gameName, this.props.moveTime)
+			.then(res => console.log(res))
+			.catch(e => console.log(e));
+	}
 
-	return (
-		<KeyboardDismiss>
-			<View style={style.container}>
-				<Header backButton={true} />
-				<View style={style.row}>
-					<Text>Game Name:</Text>
-					<TextInput
-						style={style.textInput}
-						onChange={onTextChange}
-						value={gameName}
-						autoCapitalize={"none"}
-					/>
+	public render() {
+		const { moveTime, gameName } = this.props;
+
+		const blackTextColor =
+			this.props.switchColor === Color.black
+				? { color: globalColors.white }
+				: { color: globalColors.black };
+		const whiteTextColor =
+			this.props.switchColor === Color.white
+				? { color: globalColors.white }
+				: { color: globalColors.black };
+
+		const blackBackgroundColor =
+			this.props.switchColor === Color.black
+				? { backgroundColor: globalColors.black }
+				: { backgroundColor: globalColors.grey };
+
+		const whiteBackgroundColor =
+			this.props.switchColor === Color.white
+				? { backgroundColor: globalColors.black }
+				: { backgroundColor: globalColors.grey };
+
+		return (
+			<KeyboardDismiss>
+				<View style={style.container}>
+					<Header backButton={true} />
+					<View style={style.row}>
+						<Text>Game Name:</Text>
+						<TextInput
+							style={style.textInput}
+							onChange={this.onTextChange}
+							value={gameName}
+							autoCapitalize={"none"}
+						/>
+					</View>
+					<View style={style.rowChoose}>
+						<Text>Choose your color:</Text>
+						<TouchableOpacity onPress={this.blackPress}>
+							<View
+								style={[
+									style.chooseBorder,
+									blackBackgroundColor
+								]}
+							>
+								<Text style={[blackTextColor]}>Black</Text>
+							</View>
+						</TouchableOpacity>
+						<TouchableOpacity onPress={this.whitePress}>
+							<View
+								style={[
+									style.chooseBorder,
+									whiteBackgroundColor
+								]}
+							>
+								<Text style={[whiteTextColor]}>White</Text>
+							</View>
+						</TouchableOpacity>
+					</View>
+					<View style={style.moveTimeView}>
+						<Text>Move Time: </Text>
+						<Slider
+							style={style.sliderStyle}
+							maximumValue={300}
+							minimumValue={30}
+							step={30}
+							onValueChange={this.handleSliderChange}
+						/>
+					</View>
+					<Text style={style.moveTimeValue}>{moveTime}</Text>
+					<View style={style.buttonView}>
+						<ButtonWFunc
+							text={"Create"}
+							onPress={this.handleCreatePress}
+						/>
+					</View>
 				</View>
-				<View style={style.rowChoose}>
-					<Text>Choose your color:</Text>
-					<TouchableOpacity onPress={blackPress}>
-						<View
-							style={[style.chooseBorder, blackBackgroundColor]}
-						>
-							<Text style={[blackTextColor]}>Black</Text>
-						</View>
-					</TouchableOpacity>
-					<TouchableOpacity onPress={whitePress}>
-						<View
-							style={[style.chooseBorder, whiteBackgroundColor]}
-						>
-							<Text style={[whiteTextColor]}>White</Text>
-						</View>
-					</TouchableOpacity>
-				</View>
-			</View>
-		</KeyboardDismiss>
-	);
-};
+			</KeyboardDismiss>
+		);
+	}
+}
 
 const style = StyleSheet.create({
 	container: {
@@ -113,8 +166,20 @@ const style = StyleSheet.create({
 		justifyContent: "space-evenly",
 		alignItems: "center"
 	},
-	rowChoose: {
+	moveTimeView: {
 		marginTop: scale(20),
+		flexDirection: "row",
+		justifyContent: "space-evenly",
+		alignItems: "center"
+	},
+	sliderStyle: {
+		width: scale(200)
+	},
+	moveTimeValue: {
+		marginLeft: scale(50)
+	},
+	rowChoose: {
+		marginTop: scale(30),
 		flexDirection: "row",
 		justifyContent: "space-evenly",
 		alignItems: "center"
@@ -124,12 +189,17 @@ const style = StyleSheet.create({
 		borderColor: globalColors.black,
 		borderRadius: 20,
 		borderWidth: 1
+	},
+	buttonView: {
+		marginTop: scale(20),
+		alignItems: "center"
 	}
 });
 
 const mapStateToProps = (state: AppState) => ({
 	gameName: state.game.gameName,
-	switchColor: state.game.adminColor
+	switchColor: state.game.adminColor,
+	moveTime: state.game.moveTime
 });
 
 export default connect(mapStateToProps)(CreateGame);
