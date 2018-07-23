@@ -5,12 +5,15 @@ import { Provider, connect } from "react-redux";
 import store from "./src/store";
 import Router from "./src/router";
 import Loading from "./src/components/Loading";
+import GameEvents from "./src/gameEvents/GameEvents";
 
 class AppComponent extends Component {
 	render() {
 		return (
 			<Loading>
-				<Router />
+				<GameEvents>
+					<Router />
+				</GameEvents>
 			</Loading>
 		);
 	}

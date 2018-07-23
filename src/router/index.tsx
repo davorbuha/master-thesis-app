@@ -5,6 +5,8 @@ import SettingsInput from "../screens/SettingsInput";
 import { View, StyleSheet } from "react-native";
 import CreateGame from "../screens/CreateGame";
 import GamesScreen from "../screens/GamesScreen";
+import AdminGame from "../screens/AdminGame";
+import PlayerGame from "../screens/PlayerGame";
 
 const Router = () => {
 	return (
@@ -14,6 +16,8 @@ const Router = () => {
 				<Route path="/settingsInput" component={SettingsInput} />
 				<Route path="/createGame" component={CreateGame} />
 				<Route path="/gamesScreen" component={GamesScreen} />
+				<Route path="/adminGame" component={AdminGame} />
+				<Route path="/playerGame" component={PlayerGame} />
 			</View>
 		</NativeRouter>
 	);

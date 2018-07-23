@@ -11,12 +11,14 @@ import {
 } from "react-native";
 
 import { AppState } from "../store";
-import { Color } from "../gameReducer";
+import { Color, InGameState } from "../gameReducer";
 import { connect } from "react-redux";
 import {
 	changeGameName,
 	changeColorSwitch,
-	changeMoveTime
+	changeMoveTime,
+	updateCreated,
+	updateGameState
 } from "../gameReducer/actions";
 import Header from "../components/Header";
 import { scale } from "../styles/scale";
@@ -24,12 +26,18 @@ import { globalColors } from "../styles/colors";
 import KeyboardDismiss from "../components/KeyboardDismiss";
 import ButtonWFunc from "../components/ButtonWFunc";
 import service from "../../service";
+import { CreateGameReply } from "../types/service";
+import { withRouter } from "react-router";
 
 interface Props {
 	gameName: string;
 	switchColor: Color;
 	dispatch: any;
 	moveTime: number;
+	color: Color;
+	history: any;
+	location: any;
+	match: any;
 }
 
 class CreateGame extends Component<Props> {
@@ -61,9 +69,18 @@ class CreateGame extends Component<Props> {
 	}
 
 	handleCreatePress() {
+		console.log("component", this.props.color);
 		service
-			.createGame(this.props.gameName, this.props.moveTime)
-			.then(res => console.log(res))
+			.createGame(
+				this.props.gameName,
+				this.props.moveTime,
+				this.props.color
+			)
+			.then((res: CreateGameReply) => {
+				this.dispatch(updateCreated(res.AdminToken, res.id));
+				this.dispatch(updateGameState(InGameState.waitForPlayerTwo));
+				this.props.history.push("/adminGame");
+			})
 			.catch(e => console.log(e));
 	}
 
@@ -199,7 +216,8 @@ const style = StyleSheet.create({
 const mapStateToProps = (state: AppState) => ({
 	gameName: state.game.gameName,
 	switchColor: state.game.adminColor,
-	moveTime: state.game.moveTime
+	moveTime: state.game.moveTime,
+	color: state.game.adminColor
 });
 
-export default connect(mapStateToProps)(CreateGame);
+export default connect(mapStateToProps)(withRouter<Props>(CreateGame));

@@ -1,3 +1,5 @@
+import { Color } from "../gameReducer";
+
 export class CreateGameReply {
 	public static fromJSON(maybe: any): CreateGameReply {
 		return new CreateGameReply(maybe.admin_token, maybe.id);
@@ -12,5 +14,10 @@ export class CreateGameReply {
 }
 
 export interface Service {
-	createGame(gameName: string, moveTime: number): Promise<CreateGameReply>;
+	createGame(
+		gameName: string,
+		moveTime: number,
+		adminColor: Color
+	): Promise<CreateGameReply>;
+	cancelGame(id: number, adminToken: string): Promise<boolean>;
 }

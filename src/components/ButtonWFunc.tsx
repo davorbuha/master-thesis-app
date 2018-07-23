@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, withRouter } from "react-router-native";
+import { withRouter } from "react-router-native";
 import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
 import { scale } from "../styles/scale";
 
